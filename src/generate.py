@@ -11,6 +11,7 @@ Usage:
 
 import json
 import argparse
+from collections import defaultdict
 from pathlib import Path
 import yaml  # pip install pyyaml
 
@@ -82,24 +83,59 @@ def mermaid_id(pkg_id: str) -> str:
     return pkg_id.replace(".", "_").replace("-", "_")
 
 
-def build_mermaid(own_packages: list[dict], external_ids: set[str], external_config: dict) -> str:
-    lines = ["```mermaid", "graph TD"]
+def find_common_prefix_len(pkg_ids: list[str]) -> int:
+    """Returns the number of leading dot-separated segments shared by all package IDs."""
+    if not pkg_ids:
+        return 0
+    split = [pid.split(".") for pid in pkg_ids]
+    min_len = min(len(s) for s in split)
+    count = 0
+    for i in range(min_len):
+        if len({s[i] for s in split}) == 1:
+            count += 1
+        else:
+            break
+    return count
 
-    # Node definitions
+
+def detect_group(pkg_id: str, common_prefix_len: int) -> str:
+    """Returns the group label for a package (first segment after the common prefix)."""
+    segments = pkg_id.split(".")
+    if len(segments) > common_prefix_len:
+        return segments[common_prefix_len].replace("-", " ").title()
+    return "Other"
+
+
+def build_mermaid(own_packages: list[dict], external_ids: set[str], external_config: dict) -> str:
+    lines = ["```mermaid", "graph LR"]
+
+    # Group own packages by their first unique prefix segment
+    own_ids_list = [p["id"] for p in own_packages]
+    prefix_len = find_common_prefix_len(own_ids_list)
+    groups: dict[str, list[dict]] = defaultdict(list)
+    for p in own_packages:
+        groups[detect_group(p["id"], prefix_len)].append(p)
+
+    # Own package subgraphs
     lines.append("")
     lines.append("    %% Own packages")
-    for p in own_packages:
-        mid = mermaid_id(p["id"])
-        label = p["display"] or p["id"]
-        lines.append(f'    {mid}["{label}"]')
+    for group_name, pkgs in groups.items():
+        lines.append(f'    subgraph "{group_name}"')
+        for p in pkgs:
+            mid = mermaid_id(p["id"])
+            label = p["display"] or p["id"]
+            lines.append(f'        {mid}["{label}"]')
+        lines.append("    end")
 
     if external_ids:
         lines.append("")
         lines.append("    %% External packages")
+        lines.append('    subgraph "External"')
         for ext_id in sorted(external_ids):
             mid = mermaid_id(ext_id)
             label = resolve_display(ext_id, external_config)
-            lines.append(f'    {mid}(["{label}"])')
+            lines.append(f'        {mid}(["{label}"])')
+        lines.append("    end")
 
     # Edges
     lines.append("")
@@ -111,8 +147,8 @@ def build_mermaid(own_packages: list[dict], external_ids: set[str], external_con
             lines.append(f"    {src} --> {dst}")
 
     # Styles
-    own_mids   = ",".join(mermaid_id(p["id"]) for p in own_packages)
-    ext_mids   = ",".join(mermaid_id(e) for e in sorted(external_ids))
+    own_mids = ",".join(mermaid_id(p["id"]) for p in own_packages)
+    ext_mids = ",".join(mermaid_id(e) for e in sorted(external_ids))
 
     lines.append("")
     lines.append("    classDef own      fill:#4a90d9,stroke:#2c5f8a,color:#fff")
