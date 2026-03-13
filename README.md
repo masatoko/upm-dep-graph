@@ -2,6 +2,9 @@
 
 Unity UPM パッケージの依存関係を Mermaid グラフ + 詳細テーブルの Markdown として出力するツール。
 
+出力例：
+![依存グラフの出力例](images/graph.png)
+
 ## 概要
 
 複数の UPM パッケージディレクトリを走査し、各 `package.json` から依存情報を収集して Markdown ファイルを生成する。
