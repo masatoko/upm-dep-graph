@@ -1,0 +1,15 @@
+# 自作パッケージ一覧
+packages:
+  - root: D:/path/to/unity_packages
+    dirs:
+      - ProjectA/Packages/com.example.package-a
+      - ProjectB/Packages/com.example.package-b
+
+# 外部パッケージの表示名カスタマイズ（省略可）
+external:
+  com.unity.netcode.gameobjects:
+    display: "Netcode for GameObjects"
+
+# 依存ルールメモ（省略可）
+rules:
+  - Core パッケージは外部依存を最小限にする
