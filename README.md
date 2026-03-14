@@ -2,7 +2,14 @@
 
 Unity UPM パッケージの依存関係を Mermaid グラフ + 詳細テーブルの Markdown として出力するツール。
 
-## グラフ出力例
+## 概要
+
+複数の UPM パッケージディレクトリを走査し、各 `package.json` から依存情報を収集して Markdown ファイルを生成する。
+
+- **自作パッケージ** は青いノード（四角）で表示
+- **外部パッケージ** (UPM / サードパーティ) はグレーのノード（角丸）で表示
+
+### グラフ出力例
 
 ```mermaid
 graph LR
@@ -43,13 +50,6 @@ graph LR
     class com_tenkaigames_tenkaikit_core,com_tenkaigames_tenkaikit_unity,com_tenkaigames_tenkaikit_platform_steam,com_tenkaigames_person,com_tenkaigames_person_ngo,com_tenkaigames_stagehand_core,com_tenkaigames_stagehand_platform_steam own
     class com_community_netcode_transport_facepunch,com_unity_addressables,com_unity_cinemachine,com_unity_netcode_gameobjects,com_unity_nuget_newtonsoft_json external
 ```
-
-## 概要
-
-複数の UPM パッケージディレクトリを走査し、各 `package.json` から依存情報を収集して Markdown ファイルを生成する。
-
-- **自作パッケージ** は青いノード（四角）で表示
-- **外部パッケージ** (UPM / サードパーティ) はグレーのノード（角丸）で表示
 
 ## 必要環境
 
