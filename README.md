@@ -2,8 +2,47 @@
 
 Unity UPM パッケージの依存関係を Mermaid グラフ + 詳細テーブルの Markdown として出力するツール。
 
-出力例：
-![依存グラフの出力例](images/graph.png)
+## グラフ出力例
+
+```mermaid
+graph LR
+
+    %% Own packages
+    subgraph "Tenkaikit"
+        com_tenkaigames_tenkaikit_core["TenkaiKit Core"]
+        com_tenkaigames_tenkaikit_unity["TenkaiKit Unity"]
+        com_tenkaigames_tenkaikit_platform_steam["TenkaiKit Platform Steam"]
+    end
+    subgraph "Stagehand"
+        com_tenkaigames_stagehand_core["Stagehand Core"]
+        com_tenkaigames_stagehand_platform_steam["Stagehand Platform Steam"]
+    end
+
+    %% External packages
+    subgraph "External"
+        com_community_netcode_transport_facepunch(["Facepunch"])
+        com_unity_addressables(["Addressables"])
+        com_unity_nuget_newtonsoft_json(["Newtonsoft Json"])
+    end
+
+    %% Dependencies
+    com_tenkaigames_tenkaikit_core --> com_unity_nuget_newtonsoft_json
+    com_tenkaigames_tenkaikit_unity --> com_tenkaigames_tenkaikit_core
+    com_tenkaigames_tenkaikit_unity --> com_unity_addressables
+    com_tenkaigames_tenkaikit_platform_steam --> com_tenkaigames_tenkaikit_core
+    com_tenkaigames_tenkaikit_platform_steam --> com_tenkaigames_tenkaikit_unity
+    com_tenkaigames_tenkaikit_platform_steam --> com_community_netcode_transport_facepunch
+    com_tenkaigames_stagehand_core --> com_unity_nuget_newtonsoft_json
+    com_tenkaigames_stagehand_core --> com_tenkaigames_tenkaikit_core
+    com_tenkaigames_stagehand_platform_steam --> com_tenkaigames_stagehand_core
+    com_tenkaigames_stagehand_platform_steam --> com_tenkaigames_tenkaikit_core
+    com_tenkaigames_stagehand_platform_steam --> com_community_netcode_transport_facepunch
+
+    classDef own      fill:#4a90d9,stroke:#2c5f8a,color:#fff
+    classDef external fill:#7a7a7a,stroke:#555,color:#fff
+    class com_tenkaigames_tenkaikit_core,com_tenkaigames_tenkaikit_unity,com_tenkaigames_tenkaikit_platform_steam,com_tenkaigames_person,com_tenkaigames_person_ngo,com_tenkaigames_stagehand_core,com_tenkaigames_stagehand_platform_steam own
+    class com_community_netcode_transport_facepunch,com_unity_addressables,com_unity_cinemachine,com_unity_netcode_gameobjects,com_unity_nuget_newtonsoft_json external
+```
 
 ## 概要
 
